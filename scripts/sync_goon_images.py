@@ -24,13 +24,33 @@ IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp"}
 
 
 def dropbox_list_folder(path: str) -> list:
+    """List all files, handling pagination for 10k+ files."""
+    all_entries = []
     resp = requests.post(
         "https://api.dropboxapi.com/2/files/list_folder",
         headers={**HEADERS, "Content-Type": "application/json"},
-        json={"path": path, "recursive": False},
+        json={"path": path, "recursive": False, "limit": 2000},
     )
-    resp.raise_for_status()
-    return resp.json().get("entries", [])
+    if not resp.ok:
+        print(f"  Dropbox error {resp.status_code}: {resp.text}")
+        resp.raise_for_status()
+    data = resp.json()
+    all_entries.extend(data.get("entries", []))
+
+    while data.get("has_more"):
+        print(f"  Paginating... ({len(all_entries)} so far)")
+        resp = requests.post(
+            "https://api.dropboxapi.com/2/files/list_folder/continue",
+            headers={**HEADERS, "Content-Type": "application/json"},
+            json={"cursor": data["cursor"]},
+        )
+        if not resp.ok:
+            print(f"  Dropbox pagination error {resp.status_code}: {resp.text}")
+            resp.raise_for_status()
+        data = resp.json()
+        all_entries.extend(data.get("entries", []))
+
+    return all_entries
 
 
 def dropbox_download(path: str, dest: Path):
