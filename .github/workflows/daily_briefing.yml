@@ -30,6 +30,13 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r requirements.txt
 
+      - name: Debug Dropbox path
+        env:
+          DROPBOX_GOONS_PATH: ${{ secrets.DROPBOX_GOONS_PATH }}
+        run: |
+          echo "Path length: ${#DROPBOX_GOONS_PATH}"
+          python -c "import os; p=os.environ['DROPBOX_GOONS_PATH']; print(f'Path: {repr(p)}')"
+          
       - name: Sync Goon images from Dropbox
         env:
           DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
