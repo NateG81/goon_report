@@ -1,4 +1,5 @@
 name: General V Daily Briefing
+
 on:
   schedule:
     - cron: "0 18 * * *"
@@ -8,53 +9,26 @@ on:
         description: "Dry run (skip social posting)"
         required: false
         default: "false"
+
 jobs:
   post-goon-briefing:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
           cache: "pip"
+
       - name: Install FFmpeg
         run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
+
       - name: Install Python dependencies
         run: pip install -r requirements.txt
-      - name: Sync Goon images from Cloudinary
-        env:
-          CLOUDINARY_API_KEY:    ${{ secrets.CLOUDINARY_API_KEY }}
-          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
-          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
-        run: python scripts/sync_goon_images.py
-      - name: Run pipeline
-        env:
-          OBSIDIAN_GOONS_PATH:          "./goons"
-          IMAGINE_API_KEY:              ${{ secrets.IMAGINE_API_KEY }}
-          ANTHROPIC_API_KEY:            ${{ secrets.ANTHROPIC_API_KEY }}
-          ELEVENLABS_API_KEY:           ${{ secrets.ELEVENLABS_API_KEY }}
-          ELEVENLABS_VOICE_ID:          ${{ secrets.ELEVENLABS_VOICE_ID }}
-          RUNWAY_API_KEY:               ${{ secrets.RUNWAY_API_KEY }}
-          INSTAGRAM_USER_ID:            ${{ secrets.INSTAGRAM_USER_ID }}
-          INSTAGRAM_ACCESS_TOKEN:       ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
-          TIKTOK_ACCESS_TOKEN:          ${{ secrets.TIKTOK_ACCESS_TOKEN }}
-          CLOUDINARY_UPLOAD_PRESET_URL: ${{ secrets.CLOUDINARY_UPLOAD_PRESET_URL }}
-          CLOUDINARY_URL:               ${{ secrets.CLOUDINARY_URL }}
-          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
-        run: python pipeline.py
-      - name: Upload output artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: goon-output-${{ github.run_number }}
-          path: output/
-          retention-days: 7
-      - name: Commit goons_log.json
-        if: success()
-        run: |
-          git config --global user.name "General V Bot"
-          git config --global user.email "generalv@goongalaxy.space"
-          git add goons/goons_log.json
-          git diff --staged --quiet || git commit -m "chore: mark Goon posted [run ${{ github.run_number }}]"
-          git push
+
+      - name: Sync Goon images from Dropbox
