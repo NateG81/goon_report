@@ -3,7 +3,7 @@ General V — Galactic Goon Content Pipeline
 ==========================================
 Stages:
   1. Pick next unprocessed Goon image from Obsidian vault
-  2. Load NFT metadata from _metadata_.json
+  2. Load NFT metadata from individual JSON file
   3. Generate operative name (deterministic from traits)
   4. Imagine.art Image Remix → cinematic villain render
   5. Claude API → General V briefing script (JSON)
@@ -11,6 +11,7 @@ Stages:
   7. Runway → background video clip
   8. FFmpeg → assemble final 9:16 MP4 with bookends + subtitles
   9. Post to Instagram Reels + TikTok
+  10. Archive to Dropbox
 """
 
 import os
@@ -40,36 +41,33 @@ log = logging.getLogger(__name__)
 
 # ── Config ─────────────────────────────────────────────────────────────────────
 OBSIDIAN_GOONS_PATH = Path(os.environ["OBSIDIAN_GOONS_PATH"]).expanduser()
-METADATA_PATH       = OBSIDIAN_GOONS_PATH / "_metadata_.json"
 OUTPUT_DIR          = Path("output")
 ASSETS_DIR          = Path("assets")
 OUTPUT_DIR.mkdir(exist_ok=True)
+DRY_RUN             = os.environ.get("DRY_RUN", "false").lower() == "true"
 
 
 def run():
     log.info("═══ General V Pipeline Starting ═══")
+    if DRY_RUN:
+        log.info("DRY RUN MODE — social posting will be skipped")
 
     # ── Stage 1: Pick next Goon ──────────────────────────────────────────────
     log.info("Stage 1: Picking next unprocessed Goon...")
     goon_image_path, edition_number = get_next_goon(OBSIDIAN_GOONS_PATH)
     if not goon_image_path:
-        log.error("No unprocessed Goons found. Add more images to the vault folder.")
+        log.error("No unprocessed Goons found.")
         sys.exit(1)
     log.info(f"  → Selected: {goon_image_path.name} (Edition #{edition_number})")
 
     # ── Stage 2: Load metadata ───────────────────────────────────────────────
     log.info("Stage 2: Loading NFT metadata...")
-    with open(METADATA_PATH) as f:
-        all_metadata = json.load(f)
-
-    # metadata is a list; find by edition number
-    metadata = next(
-        (m for m in all_metadata if m.get("custom_fields", {}).get("edition") == edition_number),
-        None
-    )
-    if not metadata:
-        log.error(f"No metadata found for edition #{edition_number}")
+    goon_json_path = OBSIDIAN_GOONS_PATH / f"{edition_number}.json"
+    if not goon_json_path.exists():
+        log.error(f"No metadata JSON found: {goon_json_path}")
         sys.exit(1)
+    with open(goon_json_path) as f:
+        metadata = json.load(f)
 
     attributes = {a["trait_type"]: a["value"].strip() for a in metadata.get("attributes", [])}
     log.info(f"  → Traits loaded: {attributes}")
@@ -138,19 +136,4 @@ def run():
     )
     log.info(f"  → Final video: {final_path}")
 
-    # ── Stage 9: Post to social ───────────────────────────────────────────────
-    caption = script_data.get("caption", f"{name_data['briefing_header']} #GoonGalaxy #GeneralV")
-
-    log.info("Stage 9a: Posting to Instagram...")
-    post_to_instagram(final_path, caption)
-
-    log.info("Stage 9b: Posting to TikTok...")
-    post_to_tiktok(final_path, caption)
-
-    # ── Mark complete ─────────────────────────────────────────────────────────
-    mark_goon_posted(OBSIDIAN_GOONS_PATH, edition_number, name_data["full_name"])
-    log.info(f"═══ Pipeline complete: {name_data['full_name']} posted ═══")
-
-
-if __name__ == "__main__":
-    run()
+    # ── Stage 9: Post to social ──────────────────────────────────────
