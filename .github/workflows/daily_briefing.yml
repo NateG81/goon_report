@@ -37,6 +37,13 @@ jobs:
           DROPBOX_JSON_PATH: "/Vault/GoonGalaxy/GoonGalaxyGenerator/create-10k-nft-collection-2.0.0/build/json"
         run: python scripts/sync_goon_images.py
 
+      - name: Debug goons directory
+        env:
+          OBSIDIAN_GOONS_PATH: "./goons"
+        run: |
+          echo "Goons directory contents:"
+          ls -la goons/ || echo "goons/ does not exist"
+
       - name: Run General V pipeline
         env:
           OBSIDIAN_GOONS_PATH: "./goons"
@@ -54,29 +61,8 @@ jobs:
           DROPBOX_GOONS_PATH: "/Vault/GoonGalaxy/GoonGalaxyGenerator/create-10k-nft-collection-2.0.0/build/images"
           DROPBOX_JSON_PATH: "/Vault/GoonGalaxy/GoonGalaxyGenerator/create-10k-nft-collection-2.0.0/build/json"
           DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
-        run: |
-          echo "Testing imports..."
-          python -c "import os; print('os ok')"
-          python -c "import anthropic; print('anthropic ok')"
-          python -c "from goon_namer import generate_goon_name; print('goon_namer ok')"
-          python -c "from imagine_render import render_goon_image; print('imagine_render ok')"
-          python -c "from script_generator import generate_briefing_script; print('script_generator ok')"
-          python -c "from voice_generator import generate_narration; print('voice_generator ok')"
-          python -c "from video_generator import generate_runway_video; print('video_generator ok')"
-          python -c "from video_assembler import assemble_final_video; print('video_assembler ok')"
-          python -c "from social_poster import post_to_instagram; print('social_poster ok')"
-          python -c "from goon_log import get_next_goon; print('goon_log ok')"
-          echo "All imports done..."
-          python -c "
-from pathlib import Path
-import os
-p = Path(os.environ['OBSIDIAN_GOONS_PATH']).expanduser()
-print(f'GOONS PATH: {p}')
-print(f'EXISTS: {p.exists()}')
-files = list(p.iterdir()) if p.exists() else []
-print(f'FILES: {[f.name for f in files]}')
-"
-          python pipeline.py
+        run: python pipeline.py
+
       - name: Upload output artifacts
         if: always()
         uses: actions/upload-artifact@v4
