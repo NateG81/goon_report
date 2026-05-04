@@ -1,3 +1,6 @@
+import sys
+print("PIPELINE STARTING", flush=True)
+sys.stdout.flush()
 """
 General V — Galactic Goon Content Pipeline
 ==========================================
