@@ -15,12 +15,12 @@ from pathlib import Path
 log = logging.getLogger(__name__)
 
 # ── Instagram ──────────────────────────────────────────────────────────────────
-IG_USER_ID    = os.environ["INSTAGRAM_USER_ID"]
-IG_TOKEN      = os.environ["INSTAGRAM_ACCESS_TOKEN"]
+IG_USER_ID    = os.environ.get("INSTAGRAM_USER_ID", "")
+IG_TOKEN      = os.environ.get("INSTAGRAM_ACCESS_TOKEN", "")
 IG_API_BASE   = "https://graph.facebook.com/v19.0"
 
 # ── TikTok ─────────────────────────────────────────────────────────────────────
-TIKTOK_TOKEN  = os.environ["TIKTOK_ACCESS_TOKEN"]
+TIKTOK_TOKEN  = os.environ.get("TIKTOK_ACCESS_TOKEN", "")
 TIKTOK_BASE   = "https://open.tiktokapis.com/v2"
 
 # ── Cloudinary (for video hosting — required by Instagram Graph API) ───────────

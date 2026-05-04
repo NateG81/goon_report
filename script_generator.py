@@ -11,7 +11,7 @@ import anthropic
 
 log = logging.getLogger(__name__)
 
-client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY", ""))
 
 SYSTEM_PROMPT = """
 You are the scriptwriter for General V, commander of the Galactic Goon forces.

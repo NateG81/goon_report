@@ -10,8 +10,8 @@ from pathlib import Path
 
 log = logging.getLogger(__name__)
 
-ELEVENLABS_API_KEY = os.environ["ELEVENLABS_API_KEY"]
-VOICE_ID           = os.environ["ELEVENLABS_VOICE_ID"]  # General V's voice ID from ElevenLabs
+ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY", "")
+VOICE_ID           = os.environ.get("ELEVENLABS_VOICE_ID", "")  # General V's voice ID from ElevenLabs
 BASE_URL           = "https://api.elevenlabs.io/v1"
 
 VOICE_SETTINGS = {

@@ -13,7 +13,7 @@ import base64
 
 log = logging.getLogger(__name__)
 
-RUNWAY_API_KEY = os.environ["RUNWAY_API_KEY"]
+RUNWAY_API_KEY = os.environ.get("RUNWAY_API_KEY", "")
 RUNWAY_BASE    = "https://api.dev.runwayml.com/v1"
 
 VIDEO_PROMPT_TEMPLATE = (

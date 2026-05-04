@@ -13,7 +13,7 @@ from pathlib import Path
 
 log = logging.getLogger(__name__)
 
-IMAGINE_API_KEY  = os.environ["IMAGINE_API_KEY"]
+IMAGINE_API_KEY  = os.environ.get("IMAGINE_API_KEY", "")
 IMAGINE_BASE_URL = "https://api.vyro.ai/v2"
 
 # Style prompt template — tuned for General V's aesthetic
