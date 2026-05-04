@@ -1,6 +1,6 @@
 """
 scripts/sync_goon_images.py
-Downloads Goon images + metadata from Dropbox vault.
+Downloads Goon images + individual JSON metadata from Dropbox vault.
 Handles filenames like: '1 (2022_09_25 16_46_17 UTC).png'
 Only downloads the next unprocessed image each run.
 """
@@ -17,8 +17,9 @@ DROPBOX_JSON_FOLDER = os.environ.get("DROPBOX_JSON_PATH", "/Vault/GoonGalaxy/Goo
 LOCAL_DIR           = Path("./goons")
 LOCAL_DIR.mkdir(exist_ok=True)
 
-HEADERS = {"Authorization": f"Bearer {DROPBOX_TOKEN}"}
+HEADERS         = {"Authorization": f"Bearer {DROPBOX_TOKEN}"}
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp"}
+TIMESTAMP       = "2022_09_25 16_46_17 UTC"
 
 
 def extract_edition_number(filename: str):
@@ -90,7 +91,7 @@ def sync_from_dropbox():
     entries = dropbox_list_folder(DROPBOX_FOLDER)
     print(f"Found {len(entries)} total entries")
 
-    # Load existing log to know which editions are already posted
+    # Load existing log
     log_path = LOCAL_DIR / "goons_log.json"
     posted = set()
     if log_path.exists():
@@ -108,75 +109,4 @@ def sync_from_dropbox():
             continue
         edition = extract_edition_number(filename)
         if edition is not None and edition not in posted:
-            image_entries.append((edition, entry))
-
-    # Sort by edition number ascending
-    image_entries.sort(key=lambda x: x[0])
-
-    if not image_entries:
-        print("  No unprocessed images found!")
-        return
-
-    # Download ONLY the next unprocessed image
-    edition, entry = image_entries[0]
-    filename = entry["name"]
-    ext = Path(filename).suffix.lower()
-    clean_name = f"{edition}{ext}"
-    dest = LOCAL_DIR / clean_name
-
-    if not dest.exists():
-        print(f"  Downloading: {filename} -> {clean_name}")
-        dropbox_download(entry["path_display"], dest)
-    else:
-        print(f"  Already exists: {clean_name}")
-
-    print(f"  Ready to process edition #{edition}")
-
-    # Pull _metadata_.json from json folder
-    metadata_dest = LOCAL_DIR / "_metadata_.json"
-    if not metadata_dest.exists():
-        print(f"  Listing json folder...")
-        json_entries = dropbox_list_folder(DROPBOX_JSON_FOLDER)
-        for e in json_entries[:5]:
-            print(f"    File: '{e['name']}' | Path: '{e['path_display']}'")
-
-    # Pull goons_log.json if it exists in Dropbox
-    try:
-        if not log_path.exists():
-            dropbox_download(f"{DROPBOX_FOLDER}/goons_log.json", log_path)
-            print(f"  Downloaded goons_log.json")
-    except Exception:
-        print(f"  No existing goons_log.json (first run)")
-
-    print("Sync complete.")
-
-
-def push_log_to_dropbox():
-    local_log = LOCAL_DIR / "goons_log.json"
-    if not local_log.exists():
-        print("  No goons_log.json to push")
-        return
-    dropbox_upload(local_log, f"{DROPBOX_FOLDER}/goons_log.json")
-    print(f"  ✓ goons_log.json synced to Dropbox")
-
-
-def archive_to_dropbox(local_video: Path, edition: int, goon_name: str):
-    safe_name = goon_name.replace('"', '').replace(' ', '_')
-    archive_folder = f"{DROPBOX_FOLDER}/posted/{edition}_{safe_name}"
-
-    if local_video.exists():
-        dropbox_upload(local_video, f"{archive_folder}/{local_video.name}")
-        print(f"  ✓ Video archived to Dropbox")
-
-    for ext in IMAGE_EXTENSIONS:
-        candidate = LOCAL_DIR / f"{edition}{ext}"
-        if candidate.exists():
-            dropbox_upload(candidate, f"{archive_folder}/{candidate.name}")
-            print(f"  ✓ Source image archived to Dropbox")
-            break
-
-    print(f"  ✓ Goon #{edition} fully archived")
-
-
-if __name__ == "__main__":
-    sync_from_dropbox()
+            image
