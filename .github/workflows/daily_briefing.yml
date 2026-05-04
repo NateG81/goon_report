@@ -54,7 +54,9 @@ jobs:
           DROPBOX_GOONS_PATH: "/Vault/GoonGalaxy/GoonGalaxyGenerator/create-10k-nft-collection-2.0.0/build/images"
           DROPBOX_JSON_PATH: "/Vault/GoonGalaxy/GoonGalaxyGenerator/create-10k-nft-collection-2.0.0/build/json"
           DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
-        run: python pipeline.py 2>&1
+        run: |
+          python -c "import pipeline" 2>&1 || true
+          python pipeline.py 2>&1
         
 
       - name: Upload output artifacts
