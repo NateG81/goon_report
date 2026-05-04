@@ -135,10 +135,10 @@ def sync_from_dropbox():
     # Pull _metadata_.json from json folder
     metadata_dest = LOCAL_DIR / "_metadata_.json"
     if not metadata_dest.exists():
-        print(f"  Downloading _metadata_.json...")
-        dropbox_download(f"{DROPBOX_JSON_FOLDER}/_metadata_ (2022_09_25 16_46_17 UTC).json", metadata_dest)
-    else:
-        print(f"  _metadata_.json already exists")
+        print(f"  Listing json folder...")
+        json_entries = dropbox_list_folder(DROPBOX_JSON_FOLDER)
+        for e in json_entries[:5]:
+            print(f"    File: '{e['name']}' | Path: '{e['path_display']}'")
 
     # Pull goons_log.json if it exists in Dropbox
     try:
