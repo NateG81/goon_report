@@ -66,10 +66,17 @@ jobs:
           python -c "from video_assembler import assemble_final_video; print('video_assembler ok')"
           python -c "from social_poster import post_to_instagram; print('social_poster ok')"
           python -c "from goon_log import get_next_goon; print('goon_log ok')"
-          echo "All imports done, running pipeline..."
+          echo "All imports done..."
+          python -c "
+from pathlib import Path
+import os
+p = Path(os.environ['OBSIDIAN_GOONS_PATH']).expanduser()
+print(f'GOONS PATH: {p}')
+print(f'EXISTS: {p.exists()}')
+files = list(p.iterdir()) if p.exists() else []
+print(f'FILES: {[f.name for f in files]}')
+"
           python pipeline.py
-        
-
       - name: Upload output artifacts
         if: always()
         uses: actions/upload-artifact@v4
