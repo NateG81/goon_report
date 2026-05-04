@@ -136,7 +136,7 @@ def sync_from_dropbox():
     metadata_dest = LOCAL_DIR / "_metadata_.json"
     if not metadata_dest.exists():
         print(f"  Downloading _metadata_.json...")
-        dropbox_download(f"{DROPBOX_JSON_FOLDER}/_metadata_.json", metadata_dest)
+        dropbox_download(f"{DROPBOX_JSON_FOLDER}/_metadata_ (2022_09_25 16_46_17 UTC).json", metadata_dest)
     else:
         print(f"  _metadata_.json already exists")
 
