@@ -40,8 +40,8 @@ jobs:
       - name: Sync Goon images from Dropbox
         env:
           DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
-          DROPBOX_GOONS_PATH: ${{ secrets.DROPBOX_GOONS_PATH }}
-          DROPBOX_JSON_PATH: ${{ secrets.DROPBOX_JSON_PATH }}
+          DROPBOX_GOONS_PATH: "/Vault/GoonGalaxy/GoonGalaxyGenerator/create-10k-nft-collection-2.0.0/build/images"
+          DROPBOX_JSON_PATH: "/Vault/GoonGalaxy/GoonGalaxyGenerator/create-10k-nft-collection-2.0.0/build/json"
         run: python scripts/sync_goon_images.py
 
       - name: Run General V pipeline
