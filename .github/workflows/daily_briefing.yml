@@ -55,8 +55,19 @@ jobs:
           DROPBOX_JSON_PATH: "/Vault/GoonGalaxy/GoonGalaxyGenerator/create-10k-nft-collection-2.0.0/build/json"
           DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
         run: |
-          python -c "import pipeline" 2>&1 || true
-          python pipeline.py 2>&1
+          echo "Testing imports..."
+          python -c "import os; print('os ok')"
+          python -c "import anthropic; print('anthropic ok')"
+          python -c "from goon_namer import generate_goon_name; print('goon_namer ok')"
+          python -c "from imagine_render import render_goon_image; print('imagine_render ok')"
+          python -c "from script_generator import generate_briefing_script; print('script_generator ok')"
+          python -c "from voice_generator import generate_narration; print('voice_generator ok')"
+          python -c "from video_generator import generate_runway_video; print('video_generator ok')"
+          python -c "from video_assembler import assemble_final_video; print('video_assembler ok')"
+          python -c "from social_poster import post_to_instagram; print('social_poster ok')"
+          python -c "from goon_log import get_next_goon; print('goon_log ok')"
+          echo "All imports done, running pipeline..."
+          python pipeline.py
         
 
       - name: Upload output artifacts
