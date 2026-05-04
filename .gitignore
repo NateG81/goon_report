@@ -1,0 +1,6 @@
+.env.local
+goons/
+output/
+debug_dropbox.py
+dropbox_auth.py
+test_dropbox.py
