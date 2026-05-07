@@ -1,22 +1,37 @@
-"""
-scripts/sync_goon_images.py
-Downloads Goon images + individual JSON metadata from Dropbox vault.
-Handles filenames like: '1 (2022_09_25 16_46_17 UTC).png'
-Only downloads the next unprocessed image each run.
-"""
-
 import os
 import re
 import json
 import requests
 from pathlib import Path
 
-DROPBOX_TOKEN       = os.environ["DROPBOX_ACCESS_TOKEN"]
-DROPBOX_FOLDER      = os.environ.get("DROPBOX_GOONS_PATH", "/Vault/GoonGalaxy/GoonGalaxyGenerator/create-10k-nft-collection-2.0.0/build/images")
-DROPBOX_JSON_FOLDER = os.environ.get("DROPBOX_JSON_PATH", "/Vault/GoonGalaxy/GoonGalaxyGenerator/create-10k-nft-collection-2.0.0/build/json")
-LOCAL_DIR           = Path("./goons")
+DROPBOX_REFRESH_TOKEN = os.environ.get("DROPBOX_REFRESH_TOKEN", "")
+DROPBOX_APP_KEY       = os.environ.get("DROPBOX_APP_KEY", "")
+DROPBOX_APP_SECRET    = os.environ.get("DROPBOX_APP_SECRET", "")
+DROPBOX_FOLDER        = os.environ.get("DROPBOX_GOONS_PATH", "/Vault/GoonGalaxy/GoonGalaxyGenerator/create-10k-nft-collection-2.0.0/build/images")
+DROPBOX_JSON_FOLDER   = os.environ.get("DROPBOX_JSON_PATH", "/Vault/GoonGalaxy/GoonGalaxyGenerator/create-10k-nft-collection-2.0.0/build/json")
+LOCAL_DIR             = Path("./goons")
 LOCAL_DIR.mkdir(exist_ok=True)
 
+IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp"}
+TIMESTAMP        = "2022_09_25 16_46_17 UTC"
+
+
+def get_access_token() -> str:
+    """Exchange refresh token for a fresh short-lived access token."""
+    resp = requests.post(
+        "https://api.dropbox.com/oauth2/token",
+        data={
+            "grant_type":    "refresh_token",
+            "refresh_token": DROPBOX_REFRESH_TOKEN,
+            "client_id":     DROPBOX_APP_KEY,
+            "client_secret": DROPBOX_APP_SECRET,
+        },
+    )
+    resp.raise_for_status()
+    return resp.json()["access_token"]
+
+
+DROPBOX_TOKEN = get_access_token()
 HEADERS          = {"Authorization": f"Bearer {DROPBOX_TOKEN}"}
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp"}
 TIMESTAMP        = "2022_09_25 16_46_17 UTC"
