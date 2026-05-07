@@ -32,22 +32,20 @@ jobs:
 
       - name: Sync Goon images from Dropbox
         env:
-          DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
+          DROPBOX_REFRESH_TOKEN: ${{ secrets.DROPBOX_REFRESH_TOKEN }}
+          DROPBOX_APP_KEY: ${{ secrets.DROPBOX_APP_KEY }}
+          DROPBOX_APP_SECRET: ${{ secrets.DROPBOX_APP_SECRET }}
           DROPBOX_GOONS_PATH: "/Vault/GoonGalaxy/GoonGalaxyGenerator/create-10k-nft-collection-2.0.0/build/images"
           DROPBOX_JSON_PATH: "/Vault/GoonGalaxy/GoonGalaxyGenerator/create-10k-nft-collection-2.0.0/build/json"
         run: python scripts/sync_goon_images.py
 
       - name: Debug goons directory
-        env:
-          OBSIDIAN_GOONS_PATH: "./goons"
-        run: |
-          echo "Goons directory contents:"
-          ls -la goons/ || echo "goons/ does not exist"
+        run: ls -la goons/ || echo "goons/ does not exist"
 
       - name: Run General V pipeline
         env:
           OBSIDIAN_GOONS_PATH: "./goons"
-          IMAGINE_API_KEY: ${{ secrets.IMAGINE_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
@@ -57,7 +55,9 @@ jobs:
           TIKTOK_ACCESS_TOKEN: ${{ secrets.TIKTOK_ACCESS_TOKEN }}
           CLOUDINARY_UPLOAD_PRESET_URL: ${{ secrets.CLOUDINARY_UPLOAD_PRESET_URL }}
           CLOUDINARY_URL: ${{ secrets.CLOUDINARY_URL }}
-          DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
+          DROPBOX_REFRESH_TOKEN: ${{ secrets.DROPBOX_REFRESH_TOKEN }}
+          DROPBOX_APP_KEY: ${{ secrets.DROPBOX_APP_KEY }}
+          DROPBOX_APP_SECRET: ${{ secrets.DROPBOX_APP_SECRET }}
           DROPBOX_GOONS_PATH: "/Vault/GoonGalaxy/GoonGalaxyGenerator/create-10k-nft-collection-2.0.0/build/images"
           DROPBOX_JSON_PATH: "/Vault/GoonGalaxy/GoonGalaxyGenerator/create-10k-nft-collection-2.0.0/build/json"
           DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
