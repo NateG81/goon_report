@@ -1,4 +1,3 @@
-cat > imagine_render.py << 'ENDOFFILE'
 """
 imagine_render.py
 Sends the Goon source image to OpenAI gpt-image-1 for cinematic villain render.
@@ -53,4 +52,3 @@ def render_goon_image(source_image: Path, name_data: dict, attributes: dict, out
     image_bytes = base64.b64decode(image_b64)
     output_path.write_bytes(image_bytes)
     log.info(f"  Render saved: {output_path} ({len(image_bytes) // 1024}KB)")
-ENDOFFILE
