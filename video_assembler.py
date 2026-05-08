@@ -183,8 +183,7 @@ def assemble_final_video(
              x=(w-text_w)/2:y=(h-text_h)/2+40:
              enable='between(t,{3+narration_dur+0.3},{total_dur})',
 
-    subtitles={srt_path}:force_style='FontName=Share Tech Mono,FontSize=20,PrimaryColour=&Hffffff,OutlineColour=&H000000,Outline=2,Alignment=2,MarginV=60':
-              enable='between(t,3,{3+narration_dur})'
+    subtitles={srt_path}:force_style='FontName=Share Tech Mono,FontSize=20,PrimaryColour=&Hffffff,OutlineColour=&H000000,Outline=2,Alignment=2,MarginV=60'
 
     [vout];
 
