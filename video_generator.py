@@ -56,7 +56,7 @@ def generate_runway_video(render_image: Path, name_data: dict, attributes: dict,
         "promptImage":  image_uri,
         "promptText":   prompt,
         "duration":     10,      # seconds — will be looped/trimmed in assembly
-        "ratio":        "768:1344",  # 9:16 vertical
+        "ratio":        "768:1280",  # 9:16 vertical
         "watermark":    False,
     }
 
