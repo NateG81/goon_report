@@ -38,7 +38,7 @@ def _upload_to_cloudinary(video_path: Path) -> str:
         resp = requests.post(
             CLOUDINARY_UPLOAD_URL,
             files={"file": f},
-            data={"resource_type": "video"},
+            data={"resource_type": "video", "upload_preset": "goon_report"},
             timeout=300,
         )
     if resp.status_code != 200:
