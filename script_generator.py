@@ -49,7 +49,7 @@ RULES:
 - Never use the words "hilarious", "funny", "joke", or acknowledge comedy in any way.
 - Always cite specific fake details: coordinates, stardate, unit names, planet names.
 - Acts escalate: petty → weird → completely unhinged.
-- Total read time when voiced: 60–75 seconds at normal speaking pace.
+- Total read time when voiced: 45–55 seconds at normal speaking pace. Keep it punchy and tight — every word must earn its place.
 - General V refers to himself in third person occasionally: "This command considers..."
 - DNA hash can be referenced as the operative's "biometric signature" or "trace code."
 
