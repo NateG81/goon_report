@@ -52,7 +52,7 @@ def generate_runway_video(render_image: Path, name_data: dict, attributes: dict,
     }
 
     payload = {
-        "model":        "gen3a_turbo",
+        "model":        "gen4_turbo",
         "promptImage":  image_uri,
         "promptText":   prompt,
         "duration":     5,       # seconds — will be looped/trimmed in assembly
