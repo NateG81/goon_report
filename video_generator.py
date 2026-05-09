@@ -25,7 +25,7 @@ VIDEO_PROMPT_TEMPLATE = (
 )
 
 POLL_INTERVAL = 10   # seconds between status checks
-MAX_WAIT      = 600  # 10 minutes max
+MAX_WAIT      = 900  # 15 minutes max
 
 
 def generate_runway_video(render_image: Path, name_data: dict, attributes: dict, output_path: Path):
