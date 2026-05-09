@@ -182,7 +182,7 @@ def push_log_to_dropbox():
 
 def archive_to_dropbox(local_video: Path, edition: int, goon_name: str):
     safe_name = goon_name.replace('"', '').replace(' ', '_')
-    archive_folder = f"{DROPBOX_FOLDER}/posted/{edition}_{safe_name}"
+    archive_folder = f"/Vault/GeneralV/prepared/{edition}_{safe_name}"
 
     if local_video.exists():
         dropbox_upload(local_video, f"{archive_folder}/{local_video.name}")
