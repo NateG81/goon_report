@@ -118,13 +118,11 @@ def run():
 
     caption = script_data.get("caption", f"{name_data['briefing_header']} #GoonGalaxy #GeneralV")
 
-    if DRY_RUN:
-        log.info("Stage 9: DRY RUN - skipping social posting")
-    else:
-        log.info("Stage 9a: Skipping Instagram for now...")
-        # post_to_instagram(final_path, caption)
-        log.info("Stage 9b: Posting to TikTok...")
-        post_to_tiktok(final_path, caption)
+    log.info("Stage 9: Saving caption for manual posting...")
+    caption_path = OUTPUT_DIR / f"goon_{edition_number}_caption.txt"
+    with open(caption_path, "w") as f:
+        f.write(caption)
+    log.info(f"  Caption saved: {caption_path}")
 
     mark_goon_posted(OBSIDIAN_GOONS_PATH, edition_number, name_data["full_name"])
 
