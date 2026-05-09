@@ -121,8 +121,8 @@ def run():
     if DRY_RUN:
         log.info("Stage 9: DRY RUN - skipping social posting")
     else:
-        log.info("Stage 9a: Posting to Instagram...")
-        post_to_instagram(final_path, caption)
+        log.info("Stage 9a: Skipping Instagram for now...")
+        # post_to_instagram(final_path, caption)
         log.info("Stage 9b: Posting to TikTok...")
         post_to_tiktok(final_path, caption)
 
