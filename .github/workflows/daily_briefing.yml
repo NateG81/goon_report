@@ -50,6 +50,8 @@ jobs:
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
           RUNWAY_API_KEY: ${{ secrets.RUNWAY_API_KEY }}
+          FAL_API_KEY: ${{ secrets.FAL_API_KEY }}
+          FAL_KEY: ${{ secrets.FAL_API_KEY }}
           INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
           INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
           TIKTOK_ACCESS_TOKEN: ${{ secrets.TIKTOK_ACCESS_TOKEN }}
