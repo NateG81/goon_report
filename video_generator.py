@@ -3,6 +3,10 @@ video_generator.py
 Generates background video via fal.ai Seedance 2.0 image-to-video API.
 """
 import os
+
+# Must be set before importing fal_client
+os.environ["FAL_KEY"] = os.environ.get("FAL_API_KEY", "")
+
 import logging
 import requests
 import fal_client
@@ -13,10 +17,11 @@ log = logging.getLogger(__name__)
 FAL_API_KEY = os.environ.get("FAL_API_KEY", "")
 
 VIDEO_PROMPT_TEMPLATE = (
-    "{name} the {class_label} class operative stands in a classified outer rim "
-    "space station briefing room, dramatic slow camera push in, amber emergency "
-    "lighting, holographic displays flickering, subtle atmospheric smoke, "
-    "cinematic sci-fi, 9:16 vertical portrait"
+    "{name} the {class_label} class alien operative committing absurd space crimes "
+    "in a neon-lit outer rim space station, chaotic and comedic villain energy, "
+    "dramatic cinematic camera movement following the action, "
+    "amber emergency lighting flickering, holographic alarms triggering, "
+    "cartoony exaggerated motion, 9:16 vertical"
 )
 
 
