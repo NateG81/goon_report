@@ -1,3 +1,10 @@
+"""
+scripts/sync_goon_images.py
+Downloads Goon images + individual JSON metadata from Dropbox vault.
+Uses refresh token to auto-generate fresh access tokens.
+Only downloads the next unprocessed image each run.
+"""
+
 import os
 import re
 import json
@@ -15,9 +22,10 @@ LOCAL_DIR.mkdir(exist_ok=True)
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp"}
 TIMESTAMP        = "2022_09_25 16_46_17 UTC"
 
+_DROPBOX_TOKEN = None
+
 
 def get_access_token() -> str:
-    """Exchange refresh token for a fresh short-lived access token."""
     resp = requests.post(
         "https://api.dropbox.com/oauth2/token",
         data={
@@ -27,28 +35,30 @@ def get_access_token() -> str:
             "client_secret": DROPBOX_APP_SECRET,
         },
     )
-    resp.raise_for_status()
+    if not resp.ok:
+        print(f"  Token refresh error {resp.status_code}: {resp.text}")
+        resp.raise_for_status()
     return resp.json()["access_token"]
 
 
-DROPBOX_TOKEN = get_access_token()
-HEADERS          = {"Authorization": f"Bearer {DROPBOX_TOKEN}"}
-IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp"}
-TIMESTAMP        = "2022_09_25 16_46_17 UTC"
+def get_headers() -> dict:
+    global _DROPBOX_TOKEN
+    if not _DROPBOX_TOKEN:
+        _DROPBOX_TOKEN = get_access_token()
+    return {"Authorization": f"Bearer {_DROPBOX_TOKEN}"}
 
 
 def extract_edition_number(filename: str):
-    """Extract edition number from '1 (2022_09_25 16_46_17 UTC).png' -> 1"""
     match = re.match(r'^(\d+)', filename)
     return int(match.group(1)) if match else None
 
 
 def dropbox_list_folder(path: str) -> list:
-    """List all files, handling pagination for 10k+ files."""
     all_entries = []
+    headers = get_headers()
     resp = requests.post(
         "https://api.dropboxapi.com/2/files/list_folder",
-        headers={**HEADERS, "Content-Type": "application/json"},
+        headers={**headers, "Content-Type": "application/json"},
         json={"path": path, "recursive": False, "limit": 2000},
     )
     if not resp.ok:
@@ -61,7 +71,7 @@ def dropbox_list_folder(path: str) -> list:
         print(f"  Paginating... ({len(all_entries)} so far)")
         resp = requests.post(
             "https://api.dropboxapi.com/2/files/list_folder/continue",
-            headers={**HEADERS, "Content-Type": "application/json"},
+            headers={**headers, "Content-Type": "application/json"},
             json={"cursor": data["cursor"]},
         )
         if not resp.ok:
@@ -74,20 +84,22 @@ def dropbox_list_folder(path: str) -> list:
 
 
 def dropbox_download(path: str, dest: Path):
+    headers = get_headers()
     resp = requests.post(
         "https://content.dropboxapi.com/2/files/download",
-        headers={**HEADERS, "Dropbox-API-Arg": json.dumps({"path": path})},
+        headers={**headers, "Dropbox-API-Arg": json.dumps({"path": path})},
     )
     resp.raise_for_status()
     dest.write_bytes(resp.content)
 
 
 def dropbox_upload(local_path: Path, dropbox_path: str):
+    headers = get_headers()
     with open(local_path, "rb") as f:
         resp = requests.post(
             "https://content.dropboxapi.com/2/files/upload",
             headers={
-                **HEADERS,
+                **headers,
                 "Content-Type": "application/octet-stream",
                 "Dropbox-API-Arg": json.dumps({
                     "path": dropbox_path,
@@ -106,14 +118,12 @@ def sync_from_dropbox():
     entries = dropbox_list_folder(DROPBOX_FOLDER)
     print(f"Found {len(entries)} total entries")
 
-    # Load existing log
     log_path = LOCAL_DIR / "goons_log.json"
     posted = set()
     if log_path.exists():
         with open(log_path) as f:
             posted = set(int(k) for k in json.load(f).get("posted", {}).keys())
 
-    # Build sorted list of unprocessed image entries
     image_entries = []
     for entry in entries:
         if entry[".tag"] != "file":
@@ -132,7 +142,6 @@ def sync_from_dropbox():
         print("  No unprocessed images found!")
         return
 
-    # Download ONLY the next unprocessed image
     edition, entry = image_entries[0]
     filename = entry["name"]
     ext = Path(filename).suffix.lower()
@@ -147,7 +156,6 @@ def sync_from_dropbox():
 
     print(f"  Ready to process edition #{edition}")
 
-    # Download individual JSON metadata for this edition
     json_filename = f"{edition} ({TIMESTAMP}).json"
     json_dest = LOCAL_DIR / f"{edition}.json"
     if not json_dest.exists():
@@ -160,7 +168,6 @@ def sync_from_dropbox():
     else:
         print(f"  Metadata already exists: {edition}.json")
 
-    # Pull goons_log.json if it exists
     try:
         if not log_path.exists():
             dropbox_download(f"{DROPBOX_FOLDER}/goons_log.json", log_path)
