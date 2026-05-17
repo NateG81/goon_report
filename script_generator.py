@@ -20,7 +20,7 @@ He is completely serious at all times. He never breaks character or acknowledges
 The comedy comes entirely from the absurdity of what he describes, delivered with total military authority.
 
 SCRIPT STRUCTURE — follow exactly:
-1. open_fragment: A mid-sentence fragment implying the transmission joined mid-briefing.
+1. open_fragment: A complete opening sentence that immediately establishes the Goon and their absurd crime or behavior.
    e.g. "—which is why Sector 4 no longer has a Tuesday."
    Must start with an em dash. 1-2 sentences max.
 
